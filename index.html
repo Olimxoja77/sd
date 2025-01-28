@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Search</title>
+  <style>
+    .box {
+      border: 1px solid;
+      margin-left: 500px;
+      text-align: center;
+      width: 500px;
+      height: 50px;
+      backdrop-filter: blur(8px);
+      margin-top: 100px;
+      transition: 1s linear;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    body {
+      background-image: url("https://www.un.org/sites/un2.un.org/files/styles/large-article-image-style-16-9/public/field/image/2023/03/52196025795_06f077377a_c.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      width: 100%;
+    }
+
+    .box2 {
+      height: 500px;
+      transition: 1s linear;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <input type="text" id="city" placeholder="Enter city name">
+    <button>Search</button>
+    <div id="weather-info"></div> <!-- Weather info will go here -->
+    <img id="weather-icon" src="" alt="" />
+  </div>
+
+  <script>
+    let btn = document.querySelector('button');
+    let div = document.querySelector('.box');
+    let weatherInfo = document.getElementById('weather-info');
+    let weatherIcon = document.getElementById('weather-icon');
+    let key = "5f1077f561d87b1be334b15838fc01b4";
+
+    btn.addEventListener('click', () => {
+      let inp = document.getElementById('city').value;
+      div.classList.toggle("box2");  // Toggle between small and large box
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${inp}&units=metric&appid=${key}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+
+          if (data.cod !== 200) {
+            weatherInfo.textContent = "City not found!";
+            weatherIcon.src = "";  // Clear any old image
+            return;
+          }
+
+          // Display weather info
+          weatherInfo.innerHTML = `
+            <p>Weather: ${data.weather[0].main}</p>
+            <p>Temperature: ${data.main.temp}°C</p>
+            <p>Humidity: ${data.main.humidity}%</p>
+          `;
+
+          // Change the icon based on weather
+          switch (data.weather[0].main) {
+            case 'Clear':
+              weatherIcon.src = "./sun.png";  // Add path to your sun image
+              break;
+            case 'Clouds':
+              weatherIcon.src = "./cloudy.png";  // Add path to your cloudy image
+              break;
+            case 'Snow':
+              weatherIcon.src = "./snow.png";  // Add path to your snow image
+              break;
+            default:
+              weatherIcon.src = "./default.png";  // Fallback image
+              break;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          weatherInfo.textContent = "Error fetching weather data!";
+        });
+    });
+  </script>
+</body>
+</html>
